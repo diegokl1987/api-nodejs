@@ -71,4 +71,29 @@ export class UsersService {
       data: { refreshTokenHash: hash },
     });
   }
+
+  async me(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true, createdAt: true },
+    });
+
+    if (!user) throw new NotFoundException('User no encontrado');
+    return user;
+  }
+
+  async updateMe(userId: string, dto: { name?: string; password?: string }) {
+    const exists = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!exists) throw new NotFoundException('User no encontrado');
+
+    const data: any = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.password) data.passwordHash = await bcrypt.hash(dto.password, 12);
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: { id: true, email: true, name: true, createdAt: true },
+    });
+  }
 }
