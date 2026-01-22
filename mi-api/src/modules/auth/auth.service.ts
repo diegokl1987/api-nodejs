@@ -10,16 +10,16 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  private signAccessToken(sub: string, email: string) {
+  private signAccessToken(sub: string, email: string, role: string) {
     return this.jwt.signAsync(
-      { sub, email, typ: 'access' },
+      { sub, email, role, typ: 'access' },
       { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' },
     );
   }
 
-  private signRefreshToken(sub: string, email: string) {
+  private signRefreshToken(sub: string, email: string, role: string) {
     return this.jwt.signAsync(
-      { sub, email, typ: 'refresh' },
+      { sub, email, role, typ: 'refresh' },
       { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' },
     );
   }
@@ -31,8 +31,8 @@ export class AuthService {
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) throw new UnauthorizedException('Credenciales inválidas');
 
-    const accessToken = await this.signAccessToken(user.id, user.email);
-    const refreshToken = await this.signRefreshToken(user.id, user.email);
+    const accessToken = await this.signAccessToken(user.id, user.email, user.role);
+    const refreshToken = await this.signRefreshToken(user.id, user.email, user.role);
 
     const refreshHash = await bcrypt.hash(refreshToken, 12);
     await this.users.setRefreshTokenHash(user.id, refreshHash);
@@ -49,8 +49,8 @@ export class AuthService {
     const ok = await bcrypt.compare(refreshToken, user.refreshTokenHash);
     if (!ok) throw new ForbiddenException('Refresh inválido');
 
-    const accessToken = await this.signAccessToken(user.id, user.email);
-    const newRefreshToken = await this.signRefreshToken(user.id, user.email);
+    const accessToken = await this.signAccessToken(user.id, user.email, user.role);
+    const newRefreshToken = await this.signRefreshToken(user.id, user.email, user.role);
 
     await this.users.setRefreshTokenHash(user.id, await bcrypt.hash(newRefreshToken, 12));
 

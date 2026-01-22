@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 type JwtPayload = {
   sub: string;
   email: string;
+  role: 'USER' | 'ADMIN';
   typ: 'access' | 'refresh';
   iat?: number;
   exp?: number;
@@ -26,10 +27,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
   }
 
   async validate(payload: JwtPayload) {
-    // Rechaza si te intentan colar un refresh token como access
     if (payload.typ !== 'access') return null;
-
-    // Esto se inyecta a req.user
-    return { userId: payload.sub, email: payload.email };
+    return { userId: payload.sub, email: payload.email, role: payload.role };
   }
 }
