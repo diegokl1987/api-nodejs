@@ -6,6 +6,10 @@ export const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(5),
   CORS_ORIGINS: z.string().min(1),
   CORS_CREDENTIALS: z.coerce.boolean().default(true),
+  CSRF_COOKIE_NAME: z.string().min(1).default('csrf_token'),
+  CSRF_HEADER_NAME: z.string().min(1).default('x-csrf-token'),
+  CSRF_ENABLED: z.coerce.boolean().default(true),
+  CSRF_ORIGINS: z.string().optional(),
 });
 
 export function validateEnv(env: Record<string, any>) {

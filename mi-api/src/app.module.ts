@@ -8,8 +8,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './config/env';
-import { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { CsrfMiddleware } from './common/middleware/csrf.middleware';
+
 
 @Module({
   
@@ -23,6 +25,6 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestIdMiddleware).forRoutes('*');
+    consumer.apply(RequestIdMiddleware,CsrfMiddleware).forRoutes('*');
   }
 }
