@@ -8,6 +8,7 @@ import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser as CurrentUserDec, CurrentUser as CurrentUserType } from '../../common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('users')
 @Controller('users')
@@ -15,6 +16,7 @@ export class UsersController {
   constructor(private users: UsersService) {}
 
   // ✅ Público: registro (crea USER)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post()
   create(@Body() dto: CreateUserDto) {
     return this.users.create(dto);

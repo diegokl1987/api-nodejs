@@ -40,13 +40,13 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async refresh(userId: string, email: string, refreshToken: string) {
+  async refresh(userId: string, email: string, refreshTokenFromCookie: string) {
     const user = await this.users.findByEmail(email);
     if (!user || user.id !== userId || !user.refreshTokenHash) {
       throw new ForbiddenException('Refresh inválido');
     }
 
-    const ok = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+    const ok = await bcrypt.compare(refreshTokenFromCookie, user.refreshTokenHash);
     if (!ok) throw new ForbiddenException('Refresh inválido');
 
     const accessToken = await this.signAccessToken(user.id, user.email, user.role);
