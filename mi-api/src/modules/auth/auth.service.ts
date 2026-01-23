@@ -34,8 +34,7 @@ export class AuthService {
     const accessToken = await this.signAccessToken(user.id, user.email, user.role);
     const refreshToken = await this.signRefreshToken(user.id, user.email, user.role);
 
-    const refreshHash = await bcrypt.hash(refreshToken, 12);
-    await this.users.setRefreshTokenHash(user.id, refreshHash);
+    await this.users.setRefreshTokenHash(user.id, await bcrypt.hash(refreshToken, 12));
 
     return { accessToken, refreshToken };
   }
